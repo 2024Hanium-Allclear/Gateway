@@ -34,7 +34,7 @@ jobs:
         if: contains(github.ref, 'main')
         run: |
           cd ./src/main
-          mkdir resources
+          mkdir -p resources 
           cd ./resources
           touch ./application.yml
           ls *
