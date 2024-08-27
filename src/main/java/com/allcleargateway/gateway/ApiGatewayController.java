@@ -29,17 +29,17 @@ public class ApiGatewayController {
 
     @RequestMapping(value = "/waiting/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> forwardWaitingRequest(HttpServletRequest request) throws IOException {
-        return forwardRequest(request, "http://waiting.allclear-server.com:8081", "/waiting");
+        return forwardRequest(request, "https://waiting.allclear-server.com:8081", "/waiting");
     }
 
     @RequestMapping(value = "/user/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> forwardUserRequest(HttpServletRequest request) throws IOException {
-        return forwardRequest(request, "http://user.allclear-server.com:8082", "/user");
+        return forwardRequest(request, "https://user.allclear-server.com:8082", "/user");
     }
 
     @RequestMapping(value = "/lecture/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> forwardLectureRequest(HttpServletRequest request) throws IOException {
-        return forwardRequest(request, "http://lecture.allclear-server.com:8083", "/lecture");
+        return forwardRequest(request, "https://lecture.allclear-server.com:8083", "/lecture");
     }
 
     private ResponseEntity<String> forwardRequest(HttpServletRequest request, String targetBaseUrl, String pathPrefix) throws IOException {
