@@ -1,103 +1,78 @@
-name: Deploy to Amazon ECS CI/CD
+steps:
+  - name: Checkout
+    uses: actions/checkout@v3
 
-on:
-  push:
-    branches: [ "main" ]
+  - name: Set up JDK 17
+    uses: actions/setup-java@v3
+    with:
+      java-version: '17'
+      distribution: 'temurin'
 
-env:
-  AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: gateway-repo
-  ECS_SERVICE: gate-service
-  ECS_CLUSTER: allclear_cluster
-  CONTAINER_NAME: gateway-container
+  - name: Grant execute permission for gradlew
+    run: chmod +x gradlew
 
-jobs:
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    environment: production
+  - name: Create application.yml
+    if: contains(github.ref, 'main')
+    run: |
+      cd ./src/main
+      mkdir -p resources 
+      cd ./resources
+      touch ./application.yml
+      ls *
+      echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+    shell: bash
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  - name: Add CA certificate
+    run: |
+      echo "${{ secrets.CA_CERT }}" > ca-cert.pem
+      keytool -import -alias custom-ca -file ca-cert.pem -keystore $JAVA_HOME/lib/security/cacerts -storepass ${{ secrets.KEYSTORE_PASSWORD }} -noprompt
+    shell: bash
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+  - name: Create keystore.p12
+    run: |
+      keytool -importkeystore -srckeystore $JAVA_HOME/lib/security/cacerts -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
+    shell: bash
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+  - name: Build with Gradle
+    run: ./gradlew build -x test
+    shell: bash
 
-      - name: Create application.yml
-        run: |
-          cd ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > application.yml
-        shell: bash
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      aws-region: ${{ env.AWS_REGION }}
 
-      - name: Build with Gradle
-        run: ./gradlew build -x test
-        shell: bash
+  - name: Login to Amazon ECR
+    id: login-ecr
+    uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Save certificates to files
-        run: |
-          
-          echo "${{ secrets.CERTIFICATE }}" > certificate.crt
-          echo "${{ secrets.CERTIFICATE_CHAIN }}" > certificate_chain.crt
-          echo "${{ secrets.PRIVATE_KEY }}" > private_key.key
+  - name: Build, tag, and push image to Amazon ECR
+    id: build-image
+    env:
+      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      IMAGE_TAG: ${{ github.sha }}
+    run: |
+      docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+      docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Combine certificates into a PEM file
-        run: |
-          cat certificate.crt certificate_chain.crt > fullchain.pem
+  - name: Write ECS task definition to file
+    run: echo "${{ secrets.ECS_TASK_DEFINITION_JSON }}" > gateway-task.json
 
-      - name: Create Java KeyStore
-        run: |
-          openssl pkcs12 -export -in fullchain.pem -inkey private_key.key -out keystore.p12 -name mykey -passout pass:${{ secrets.KEY_STORE_PASSWORD }}
-          keytool -importkeystore -deststorepass ${{ secrets.KEY_STORE_PASSWORD }} -destkeypass ${{ secrets.KEY_PASSWORD }} -destkeystore src/main/resources/keystore.jks -srckeystore keystore.p12 -srcstoretype PKCS12 -srcstorepass ${{ secrets.KEY_STORE_PASSWORD }}
-        
+  - name: Fill in the new image ID in the Amazon ECS task definition
+    id: task-def
+    uses: aws-actions/amazon-ecs-render-task-definition@v1
+    with:
+      task-definition: gateway-task.json
+      container-name: ${{ env.CONTAINER_NAME }}
+      image: ${{ steps.build-image.outputs.image }}
 
-      - name: Add CA certificate to Java keystore
-        run: |
-          sudo keytool -import -noprompt -trustcacerts -alias exampleCA -file certificate.crt -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit
-        continue-on-error: false
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
-
-      - name: Write ECS task definition to file
-        run: echo "${{ secrets.ECS_TASK_DEFINITION_JSON }}" > gateway-task.json
-
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: gateway-task.json
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ env.image }}
-
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+  - name: Deploy Amazon ECS task definition
+    uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    with:
+      task-definition: ${{ steps.task-def.outputs.task-definition }}
+      service: ${{ env.ECS_SERVICE }}
+      cluster: ${{ env.ECS_CLUSTER }}
+      wait-for-service-stability: true
