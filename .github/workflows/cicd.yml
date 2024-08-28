@@ -33,12 +33,8 @@ jobs:
       - name: Create application.yml
         if: contains(github.ref, 'main')
         run: |
-          cd ./src/main
-          mkdir -p resources 
-          cd ./resources
-          touch ./application.yml
-          ls *
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
         shell: bash
 
       - name: Add CA certificate
@@ -49,7 +45,7 @@ jobs:
 
       - name: Create keystore.p12
         run: |
-          keytool -importkeystore -srckeystore custom-keystore.jks -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
+          keytool -importkeystore -srckeystore custom-keystore.jks -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore ./src/main/resources/keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
         shell: bash
 
       - name: Build with Gradle
