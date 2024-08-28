@@ -7,9 +7,10 @@ on:
 env:
   AWS_REGION: ap-northeast-2                   # AWS region, e.g. us-west-1
   ECR_REPOSITORY: gateway-repo                  # Amazon ECR repository name
-  ECS_SERVICE: gate-service              # Amazon ECS service name
-  ECS_CLUSTER: allclear_cluster                 # Amazon ECS cluster name
-  CONTAINER_NAME: gateway-container           # set this to the name of the container in the containerDefinitions section of your task definition
+  ECS_SERVICE: gate-service                    # Amazon ECS service name
+  ECS_CLUSTER: allclear_cluster                # Amazon ECS cluster name
+  CONTAINER_NAME: gateway-container            # set this to the name of the container in the containerDefinitions section of your task definition
+  CA_CERT_PEM: ${{ secrets.CA_CERT_PEM }}      # PEM certificate secret
 
 jobs:
   deploy:
@@ -30,7 +31,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: create application.yml
+      - name: Create application.yml
         if: contains(github.ref, 'main')
         run: |
           cd ./src/main
@@ -44,6 +45,13 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
         shell: bash
+
+      - name: Save CA certificate to file
+        run: echo "${{ secrets.CA_CERT_PEM }}" > exampleCA.pem
+
+      - name: Add CA certificate to Java keystore
+        run: |
+          sudo keytool -import -noprompt -trustcacerts -alias exampleCA -file exampleCA.pem -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
