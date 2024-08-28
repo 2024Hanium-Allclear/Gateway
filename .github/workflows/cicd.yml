@@ -42,6 +42,7 @@ jobs:
 
       - name: Save certificates to files
         run: |
+          
           echo "${{ secrets.CERTIFICATE }}" > certificate.crt
           echo "${{ secrets.CERTIFICATE_CHAIN }}" > certificate_chain.crt
           echo "${{ secrets.PRIVATE_KEY }}" > private_key.key
