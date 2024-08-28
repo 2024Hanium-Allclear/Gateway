@@ -43,14 +43,13 @@ jobs:
           keytool -import -alias custom-ca -file ca-cert.pem -keystore custom-keystore.jks -storepass ${{ secrets.KEYSTORE_PASSWORD }} -noprompt
         shell: bash
 
-      - name: Create keystore.p12
+      - name: Generate keystore
         run: |
-          keytool -importkeystore -srckeystore custom-keystore.jks -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore ./src/main/resources/keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
-        shell: bash
+          keytool -genkeypair -alias mykey -keyalg RSA -keysize 2048 -keystore keystore.p12 -storetype PKCS12 -validity 365 -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "${{ secrets.DNAME }}"
 
       - name: Verify keystore.p12 exists in root
         run: |
-          if [ -f "./src/main/resources/keystore.p12" ]; then
+          if [ -f "keystore.p12" ]; then
             echo "keystore.p12 was successfully created in the root directory."
           else
             echo "keystore.p12 not found in the root directory."
