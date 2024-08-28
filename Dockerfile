@@ -6,8 +6,8 @@ ARG JAR_FILE=./build/libs/*-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
 
 # 리소스 파일들을 복사
-COPY ./src/main/resources/keystore.p12 /app/resources/keystore.p12
-COPY ./src/main/resources/application.yml /app/resources/application.yml
+#COPY ./src/main/resources/keystore.p12 /app/resources/keystore.p12
+#COPY ./src/main/resources/application.yml /app/resources/application.yml
 
 # 애플리케이션 실행
 ENTRYPOINT [ "java", "-jar", "/app.jar" ]
