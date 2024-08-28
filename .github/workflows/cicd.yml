@@ -45,8 +45,19 @@ jobs:
 
       - name: Create keystore.p12
         run: |
-          keytool -importkeystore -srckeystore custom-keystore.jks -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore ./src/main/resources/keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
+          keytool -importkeystore -srckeystore custom-keystore.jks -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore ./keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
         shell: bash
+
+      - name: Verify keystore.p12 exists in root
+        run: |
+          if [ -f "./keystore.p12" ]; then
+            echo "keystore.p12 was successfully created in the root directory."
+          else
+            echo "keystore.p12 not found in the root directory."
+            exit 1
+          fi
+        shell: bash
+
 
       - name: Build with Gradle
         run: ./gradlew build -x test
