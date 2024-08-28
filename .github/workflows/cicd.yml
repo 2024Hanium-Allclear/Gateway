@@ -44,12 +44,12 @@ jobs:
       - name: Add CA certificate
         run: |
           echo "${{ secrets.CA_CERT }}" > ca-cert.pem
-          keytool -import -alias custom-ca -file ca-cert.pem -keystore $JAVA_HOME/lib/security/cacerts -storepass ${{ secrets.KEYSTORE_PASSWORD }} -noprompt
+          keytool -import -alias custom-ca -file ca-cert.pem -keystore custom-keystore.jks -storepass ${{ secrets.KEYSTORE_PASSWORD }} -noprompt
         shell: bash
 
       - name: Create keystore.p12
         run: |
-          keytool -importkeystore -srckeystore $JAVA_HOME/lib/security/cacerts -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
+          keytool -importkeystore -srckeystore custom-keystore.jks -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -destkeystore keystore.p12 -deststoretype PKCS12 -deststorepass ${{ secrets.KEY_PASSWORD }} -noprompt
         shell: bash
 
       - name: Build with Gradle
