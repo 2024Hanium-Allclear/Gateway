@@ -50,7 +50,7 @@ jobs:
 
       - name: Verify keystore.p12 exists in root
         run: |
-          if [ -f "./keystore.p12" ]; then
+          if [ -f "./src/main/resources/keystore.p12" ]; then
             echo "keystore.p12 was successfully created in the root directory."
           else
             echo "keystore.p12 not found in the root directory."
