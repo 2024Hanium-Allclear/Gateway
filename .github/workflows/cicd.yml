@@ -50,19 +50,11 @@ jobs:
         run: |
           cat certificate.crt certificate_chain.crt > fullchain.pem
 
-      - name: Remove passphrase from private key
-        run: |
-          openssl rsa -in private_key.key -out private_key_no_passphrase.key -passin pass:${{ secrets.PRIVATE_KEY_PASSPHRASE }}
-        env:
-          PRIVATE_KEY_PASSPHRASE: ${{ secrets.PRIVATE_KEY_PASSPHRASE }}
-
       - name: Create Java KeyStore
         run: |
-          openssl pkcs12 -export -in fullchain.pem -inkey private_key_no_passphrase.key -out keystore.p12 -name mykey -passout pass:${{ secrets.KEY_STORE_PASSWORD }}
+          openssl pkcs12 -export -in fullchain.pem -inkey private_key.key -out keystore.p12 -name mykey -passout pass:${{ secrets.KEY_STORE_PASSWORD }}
           keytool -importkeystore -deststorepass ${{ secrets.KEY_STORE_PASSWORD }} -destkeypass ${{ secrets.KEY_PASSWORD }} -destkeystore src/main/resources/keystore.jks -srckeystore keystore.p12 -srcstoretype PKCS12 -srcstorepass ${{ secrets.KEY_STORE_PASSWORD }}
-        env:
-          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        
 
       - name: Add CA certificate to Java keystore
         run: |
@@ -99,7 +91,7 @@ jobs:
         with:
           task-definition: gateway-task.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
+          image: ${{ env.image }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
