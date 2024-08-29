@@ -10,6 +10,9 @@ import java.util.Map;
 @FeignClient(name = "lectureClient", url = "https://lecture.allclear-server.com:8083", configuration = FeignConfig.class)
 public interface LectureClient {
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{relativeUrl}")
-    ResponseEntity<String> forwardRequest(@RequestHeader Map<String, String> headers, @RequestBody(required = false) String body, @PathVariable("relativeUrl") String relativeUrl);
+    @GetMapping(value = "/{relativeUrl}")
+    ResponseEntity<String> forwardGetRequest(@RequestHeader Map<String, String> headers, @PathVariable("relativeUrl") String relativeUrl);
+
+    @PostMapping(value = "/{relativeUrl}")
+    ResponseEntity<String> forwardPostRequest(@RequestHeader Map<String, String> headers, @RequestBody(required = false) String body, @PathVariable("relativeUrl") String relativeUrl);
 }

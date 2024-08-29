@@ -5,11 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -69,7 +66,13 @@ public class ApiGatewayController {
                 response = userClient.forwardRequest(headers, body, relativeUrl);
                 break;
             case "lecture":
-                response = lectureClient.forwardRequest(headers, body, relativeUrl);
+                if ("GET".equalsIgnoreCase(request.getMethod())) {
+                    response = lectureClient.forwardGetRequest(headers, relativeUrl);
+                } else if ("POST".equalsIgnoreCase(request.getMethod())) {
+                    response = lectureClient.forwardPostRequest(headers, body, relativeUrl);
+                } else {
+                    throw new UnsupportedOperationException("Unsupported HTTP method: " + request.getMethod());
+                }
                 break;
             default:
                 throw new IllegalArgumentException("Unknown endpoint: " + endpoint);
