@@ -26,17 +26,17 @@ public class ApiGatewayController {
         this.lectureClient = lectureClient;
     }
 
-    @RequestMapping(value = "/waiting/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    @RequestMapping(value = "/waiting/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
     public ResponseEntity<String> forwardWaitingRequest(HttpServletRequest request) throws IOException {
         return forwardRequest(request, "waiting");
     }
 
-    @RequestMapping(value = "/user/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    @RequestMapping(value = "/user/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
     public ResponseEntity<String> forwardUserRequest(HttpServletRequest request) throws IOException {
         return forwardRequest(request, "user");
     }
 
-    @RequestMapping(value = "/lecture/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    @RequestMapping(value = "/lecture/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
     public ResponseEntity<String> forwardLectureRequest(HttpServletRequest request) throws IOException {
         return forwardRequest(request, "lecture");
     }
@@ -60,18 +60,24 @@ public class ApiGatewayController {
         ResponseEntity<String> response;
         switch (endpoint) {
             case "waiting":
-                response = waitingClient.forwardRequest(headers, body, relativeUrl);
+                if ("GET".equalsIgnoreCase(request.getMethod())) {
+                    response = waitingClient.forwardGetRequest(headers, relativeUrl);
+                } else {
+                    response = waitingClient.forwardRequestWithBody(headers, body, relativeUrl);
+                }
                 break;
             case "user":
-                response = userClient.forwardRequest(headers, body, relativeUrl);
+                if ("GET".equalsIgnoreCase(request.getMethod())) {
+                    response = userClient.forwardGetRequest(headers, relativeUrl);
+                } else {
+                    response = userClient.forwardRequestWithBody(headers, body, relativeUrl);
+                }
                 break;
             case "lecture":
                 if ("GET".equalsIgnoreCase(request.getMethod())) {
                     response = lectureClient.forwardGetRequest(headers, relativeUrl);
-                } else if ("POST".equalsIgnoreCase(request.getMethod())) {
-                    response = lectureClient.forwardPostRequest(headers, body, relativeUrl);
                 } else {
-                    throw new UnsupportedOperationException("Unsupported HTTP method: " + request.getMethod());
+                    response = lectureClient.forwardRequestWithBody(headers, body, relativeUrl);
                 }
                 break;
             default:
