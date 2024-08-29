@@ -3,9 +3,7 @@ package com.allcleargateway.gateway;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -42,48 +40,87 @@ public class ApiGatewayController {
     }
 
     private ResponseEntity<String> forwardRequest(HttpServletRequest request, String endpoint) throws IOException {
-        // 요청 URI에서 상대 경로를 추출
+        // 요청 URI에서 상대 경로를 추출합니다.
         String requestURI = request.getRequestURI();
         String relativeUrl = requestURI.substring(requestURI.indexOf('/', 1) + 1);
 
-        // 요청의 본문(body) 읽기
+        // 요청의 본문(body)을 읽어옵니다.
         String body = request.getReader().lines().collect(Collectors.joining("\n"));
 
-        // 요청 헤더 읽기
+        // 요청 헤더를 읽어옵니다.
         Map<String, String> headers = Collections.list(request.getHeaderNames()).stream()
                 .collect(Collectors.toMap(
                         headerName -> headerName,
                         headerName -> String.join(",", Collections.list(request.getHeaders(headerName)))
                 ));
 
-        // 외부 API로 요청 전달
+        // 외부 API로 요청을 전달합니다.
         ResponseEntity<String> response;
         switch (endpoint) {
             case "waiting":
-                if ("GET".equalsIgnoreCase(request.getMethod())) {
-                    response = waitingClient.forwardGetRequest(headers, relativeUrl);
-                } else {
-                    response = waitingClient.forwardRequestWithBody(headers, body, relativeUrl);
-                }
+                response = forwardToWaitingClient(request.getMethod(), headers, body, relativeUrl);
                 break;
             case "user":
-                if ("GET".equalsIgnoreCase(request.getMethod())) {
-                    response = userClient.forwardGetRequest(headers, relativeUrl);
-                } else {
-                    response = userClient.forwardRequestWithBody(headers, body, relativeUrl);
-                }
+                response = forwardToUserClient(request.getMethod(), headers, body, relativeUrl);
                 break;
             case "lecture":
-                if ("GET".equalsIgnoreCase(request.getMethod())) {
-                    response = lectureClient.forwardGetRequest(headers, relativeUrl);
-                } else {
-                    response = lectureClient.forwardRequestWithBody(headers, body, relativeUrl);
-                }
+                response = forwardToLectureClient(request.getMethod(), headers, body, relativeUrl);
                 break;
             default:
-                throw new IllegalArgumentException("Unknown endpoint: " + endpoint);
+                throw new IllegalArgumentException("알 수 없는 엔드포인트입니다: " + endpoint);
         }
 
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+    }
+
+    private ResponseEntity<String> forwardToWaitingClient(String method, Map<String, String> headers, String body, String relativeUrl) {
+        switch (method) {
+            case "GET":
+                return waitingClient.forwardGetRequest(headers, relativeUrl);
+            case "POST":
+                return waitingClient.forwardPostRequest(headers, body, relativeUrl);
+            case "PUT":
+                return waitingClient.forwardPutRequest(headers, body, relativeUrl);
+            case "DELETE":
+                return waitingClient.forwardDeleteRequest(headers, body, relativeUrl);
+            case "PATCH":
+                return waitingClient.forwardPatchRequest(headers, body, relativeUrl);
+            default:
+                throw new IllegalArgumentException("지원하지 않는 HTTP 메서드입니다: " + method);
+        }
+    }
+
+    private ResponseEntity<String> forwardToUserClient(String method, Map<String, String> headers, String body, String relativeUrl) {
+        switch (method) {
+            case "GET":
+                return userClient.forwardGetRequest(headers, relativeUrl);
+            case "POST":
+                return userClient.forwardPostRequest(headers, body, relativeUrl);
+            case "PUT":
+                return userClient.forwardPutRequest(headers, body, relativeUrl);
+            case "DELETE":
+                return userClient.forwardDeleteRequest(headers, body, relativeUrl);
+            case "PATCH":
+                return userClient.forwardPatchRequest(headers, body, relativeUrl);
+            default:
+                throw new IllegalArgumentException("지원하지 않는 HTTP 메서드입니다: " + method);
+        }
+    }
+
+    private ResponseEntity<String> forwardToLectureClient(String method, Map<String, String> headers, String body, String relativeUrl) {
+        switch (method) {
+            case "GET":
+                return lectureClient.forwardGetRequest(headers, relativeUrl);
+            case "POST":
+                return lectureClient.forwardPostRequest(headers, body, relativeUrl);
+            case "PUT":
+                return lectureClient.forwardPutRequest(headers, body, relativeUrl);
+            case "DELETE":
+                return lectureClient.forwardDeleteRequest(headers, body, relativeUrl);
+            case "PATCH":
+                return lectureClient.forwardPatchRequest(headers, body, relativeUrl);
+            default:
+                throw new IllegalArgumentException("지원하지 않는 HTTP 메서드입니다: " + method);
+        }
     }
 }
