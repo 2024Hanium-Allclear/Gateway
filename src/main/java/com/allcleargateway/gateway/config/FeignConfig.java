@@ -3,6 +3,7 @@ package com.allcleargateway.gateway.config;
 import feign.Client;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.security.KeyStore;
 
 @Configuration
+@Slf4j
 public class FeignConfig {
 
     @Value("${server.ssl.key-store-password}")
@@ -39,7 +41,8 @@ public class FeignConfig {
                 } else if (path.startsWith("/user")) {
                     template.target("https://user.allclear-server.com:8082");
                 } else if (path.startsWith("/lecture")) {
-                    template.target("https://lecture.allclear-server.com:8083");
+                    log.info("path 통과");
+                    template.target("https://localhost:8080");
                 }
             }
         };
