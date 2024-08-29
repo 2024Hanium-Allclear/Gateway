@@ -16,10 +16,31 @@ public interface UserClient {
             @PathVariable("relativeUrl") String relativeUrl
     );
 
-    @RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH}, value = "/{relativeUrl}")
-    ResponseEntity<String> forwardRequestWithBody(
+    @PostMapping(value = "/{relativeUrl}")
+    ResponseEntity<String> forwardPostRequest(
             @RequestHeader Map<String, String> headers,
-            @RequestBody(required = false) String body,
+            @RequestBody String body,
+            @PathVariable("relativeUrl") String relativeUrl
+    );
+
+    @PutMapping(value = "/{relativeUrl}")
+    ResponseEntity<String> forwardPutRequest(
+            @RequestHeader Map<String, String> headers,
+            @RequestBody String body,
+            @PathVariable("relativeUrl") String relativeUrl
+    );
+
+    @DeleteMapping(value = "/{relativeUrl}")
+    ResponseEntity<String> forwardDeleteRequest(
+            @RequestHeader Map<String, String> headers,
+            @RequestBody(required = false) String body, // DELETE에서도 body 허용
+            @PathVariable("relativeUrl") String relativeUrl
+    );
+
+    @PatchMapping(value = "/{relativeUrl}")
+    ResponseEntity<String> forwardPatchRequest(
+            @RequestHeader Map<String, String> headers,
+            @RequestBody String body,
             @PathVariable("relativeUrl") String relativeUrl
     );
 }
