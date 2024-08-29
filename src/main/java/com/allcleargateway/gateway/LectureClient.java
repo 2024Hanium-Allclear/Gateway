@@ -11,8 +11,15 @@ import java.util.Map;
 public interface LectureClient {
 
     @GetMapping(value = "/{relativeUrl}")
-    ResponseEntity<String> forwardGetRequest(@RequestHeader Map<String, String> headers, @PathVariable("relativeUrl") String relativeUrl);
+    ResponseEntity<String> forwardGetRequest(
+            @RequestHeader Map<String, String> headers,
+            @PathVariable("relativeUrl") String relativeUrl
+    );
 
-    @PostMapping(value = "/{relativeUrl}")
-    ResponseEntity<String> forwardPostRequest(@RequestHeader Map<String, String> headers, @RequestBody(required = false) String body, @PathVariable("relativeUrl") String relativeUrl);
+    @RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH}, value = "/{relativeUrl}")
+    ResponseEntity<String> forwardRequestWithBody(
+            @RequestHeader Map<String, String> headers,
+            @RequestBody(required = false) String body,
+            @PathVariable("relativeUrl") String relativeUrl
+    );
 }
