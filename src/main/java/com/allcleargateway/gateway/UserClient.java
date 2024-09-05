@@ -1,6 +1,10 @@
 package com.allcleargateway.gateway;
 
+import com.allcleargateway.gateway.auth.dto.LoginDto;
+import com.allcleargateway.gateway.auth.dto.TokenDto;
 import com.allcleargateway.gateway.config.FeignConfig;
+import com.allcleargateway.gateway.member.dto.SignupDto;
+import com.allcleargateway.gateway.member.dto.StudentDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,4 +47,24 @@ public interface UserClient {
             @RequestBody String body,
             @PathVariable("relativeUrl") String relativeUrl
     );
+
+    //login을 위해 DTO와 DB에 있는 엔티티 비교
+    @PostMapping("/login")
+    ResponseEntity<StudentDto> forwardLoginPostRequest(
+            @RequestBody LoginDto.RequestDto body
+    );
+    
+    @PostMapping("/signup")
+    ResponseEntity<Boolean> forwardSignUpPostRequest(
+            @RequestBody SignupDto.RequestDto body
+    );
+
+    //로그인시 update된 refreshToken 저장
+    @PostMapping("/refreshToken")
+    ResponseEntity<Boolean> forwardRefreshTokenPostRequest(
+            @RequestBody TokenDto.UpdateRefreshTokenRequestDto body
+    );
+
+    @GetMapping("/student/info/{memberId}")
+    StudentDto forwardGetRequest(@PathVariable (name = "memberId")Long memberId);
 }
