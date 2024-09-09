@@ -7,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Builder
 public class LoginDto {
-    @Getter
     @Builder
-    @Setter
+    @Getter
     public static class RequestDto{
         private String loginId;
         private String password;
