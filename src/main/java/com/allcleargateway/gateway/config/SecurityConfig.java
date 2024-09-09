@@ -53,7 +53,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("**/login", "/h2-console/**", "**/health").permitAll()
+                                .requestMatchers("**/login", "/h2-console/**", "**/health/**", "**/signup").permitAll()
 
                                 .anyRequest().authenticated()
                 )
