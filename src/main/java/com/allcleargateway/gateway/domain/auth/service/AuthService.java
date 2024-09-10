@@ -1,11 +1,11 @@
-package com.allcleargateway.gateway.auth.service;
+package com.allcleargateway.gateway.domain.auth.service;
 
-import com.allcleargateway.gateway.UserClient;
-import com.allcleargateway.gateway.auth.dto.LoginDto;
-import com.allcleargateway.gateway.auth.dto.TokenDto;
-import com.allcleargateway.gateway.jwt.JwtGenerator;
-import com.allcleargateway.gateway.jwt.JwtProvider;
-import com.allcleargateway.gateway.member.dto.StudentDto;
+import com.allcleargateway.gateway.global.client.UserClient;
+import com.allcleargateway.gateway.domain.auth.dto.LoginDto;
+import com.allcleargateway.gateway.domain.auth.dto.TokenDto;
+import com.allcleargateway.gateway.domain.jwt.JwtGenerator;
+import com.allcleargateway.gateway.domain.jwt.JwtProvider;
+import com.allcleargateway.gateway.domain.member.dto.StudentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

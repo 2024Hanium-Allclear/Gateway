@@ -1,4 +1,4 @@
-package com.allcleargateway.gateway.jwt;
+package com.allcleargateway.gateway.domain.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

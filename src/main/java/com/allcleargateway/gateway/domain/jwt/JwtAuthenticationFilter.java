@@ -1,6 +1,6 @@
-package com.allcleargateway.gateway.jwt;
+package com.allcleargateway.gateway.domain.jwt;
 
-import com.allcleargateway.gateway.member.dto.StudentDto;
+import com.allcleargateway.gateway.domain.member.dto.StudentDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

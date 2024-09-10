@@ -1,4 +1,4 @@
-package com.allcleargateway.gateway.config;
+package com.allcleargateway.gateway.global.config;
 
 import feign.Client;
 import org.springframework.context.annotation.Bean;

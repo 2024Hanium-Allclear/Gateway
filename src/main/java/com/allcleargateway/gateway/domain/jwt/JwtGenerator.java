@@ -1,4 +1,4 @@
-package com.allcleargateway.gateway.jwt;
+package com.allcleargateway.gateway.domain.jwt;
 
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;

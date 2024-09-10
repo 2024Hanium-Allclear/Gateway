@@ -1,8 +1,8 @@
-package com.allcleargateway.gateway.member.controller;
+package com.allcleargateway.gateway.domain.member.controller;
 
-import com.allcleargateway.gateway.auth.dto.LoginDto;
-import com.allcleargateway.gateway.member.dto.SignupDto;
-import com.allcleargateway.gateway.member.service.MemberService;
+import com.allcleargateway.gateway.domain.auth.dto.LoginDto;
+import com.allcleargateway.gateway.domain.member.dto.SignupDto;
+import com.allcleargateway.gateway.domain.member.service.MemberService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,6 @@
-package com.allcleargateway.gateway;
+package com.allcleargateway.gateway.global.client;
 
-import com.allcleargateway.gateway.config.FeignConfig;
+import com.allcleargateway.gateway.global.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

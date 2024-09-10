@@ -1,10 +1,10 @@
-package com.allcleargateway.gateway.member.service;
+package com.allcleargateway.gateway.domain.member.service;
 
-import com.allcleargateway.gateway.UserClient;
-import com.allcleargateway.gateway.auth.dto.LoginDto;
-import com.allcleargateway.gateway.auth.service.AuthService;
-import com.allcleargateway.gateway.member.dto.SignupDto;
-import com.allcleargateway.gateway.member.dto.StudentDto;
+import com.allcleargateway.gateway.global.client.UserClient;
+import com.allcleargateway.gateway.domain.auth.dto.LoginDto;
+import com.allcleargateway.gateway.domain.auth.service.AuthService;
+import com.allcleargateway.gateway.domain.member.dto.SignupDto;
+import com.allcleargateway.gateway.domain.member.dto.StudentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

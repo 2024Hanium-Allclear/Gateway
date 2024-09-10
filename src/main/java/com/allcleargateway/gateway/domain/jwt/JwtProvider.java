@@ -1,7 +1,7 @@
-package com.allcleargateway.gateway.jwt;
+package com.allcleargateway.gateway.domain.jwt;
 
-import com.allcleargateway.gateway.UserClient;
-import com.allcleargateway.gateway.member.dto.StudentDto;
+import com.allcleargateway.gateway.global.client.UserClient;
+import com.allcleargateway.gateway.domain.member.dto.StudentDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -10,9 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
