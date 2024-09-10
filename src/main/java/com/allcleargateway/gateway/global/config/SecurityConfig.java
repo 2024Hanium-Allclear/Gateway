@@ -1,8 +1,8 @@
-package com.allcleargateway.gateway.config;
+package com.allcleargateway.gateway.global.config;
 
-import com.allcleargateway.gateway.jwt.JwtAuthenticationFilter;
-import com.allcleargateway.gateway.jwt.JwtExceptionFilter;
-import com.allcleargateway.gateway.jwt.JwtProvider;
+import com.allcleargateway.gateway.domain.jwt.JwtAuthenticationFilter;
+import com.allcleargateway.gateway.domain.jwt.JwtExceptionFilter;
+import com.allcleargateway.gateway.domain.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 

@@ -1,4 +1,4 @@
-package com.allcleargateway.gateway.auth.dto;
+package com.allcleargateway.gateway.domain.auth.dto;
 
 import lombok.Builder;
 import lombok.Getter;

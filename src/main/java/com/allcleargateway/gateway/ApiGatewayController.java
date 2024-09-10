@@ -1,5 +1,8 @@
 package com.allcleargateway.gateway;
 
+import com.allcleargateway.gateway.global.client.LectureClient;
+import com.allcleargateway.gateway.global.client.UserClient;
+import com.allcleargateway.gateway.global.client.WaitingClient;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
